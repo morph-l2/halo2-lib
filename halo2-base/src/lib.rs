@@ -57,6 +57,13 @@ pub enum QuantumCell<F: ScalarField> {
     Constant(F),
 }
 
+impl<F: ScalarField> From<AssignedValue<F>> for QuantumCell<F> {
+    /// Converts an [AssignedValue<F>] into a [QuantumCell<F>] of [type Existing(AssignedValue<F>)]
+    fn from(a: AssignedValue<F>) -> Self {
+        Self::Existing(a)
+    }
+}
+
 impl<F: ScalarField> QuantumCell<F> {
     pub fn value(&self) -> Value<&F> {
         match self {
@@ -533,6 +540,35 @@ impl<'a, F: ScalarField> Context<'a, F> {
         }
         let (fixed_cols, total_fixed) = self.fixed_stats();
         println!("Fixed columns: {fixed_cols}, Total fixed cells: {total_fixed}");
+    }
+    /// Assigns a witness value and returns the corresponding assigned cell.
+    /// * `witness`: the witness value to be assigned
+    pub fn load_witness(&mut self, witness: F) -> AssignedValue<F> {
+        self.assign_cell(QuantumCell::Witness(witness));
+        if !self.witness_gen_only {
+            self.selector.resize(self.advice.len(), false);
+        }
+        self.last().unwrap()
+    }
+
+    /// Assigns a constant value and returns the corresponding assigned cell.
+    /// * `c`: the constant value to be assigned
+    pub fn load_constant(&mut self, c: F) -> AssignedValue<F> {
+        self.assign_cell(QuantumCell::Constant(c));
+        if !self.witness_gen_only {
+            self.selector.resize(self.advice.len(), false);
+        }
+        self.last().unwrap()
+    }
+
+    /// Assigns the 0 value to a new cell or returns a previously assigned zero cell from `zero_cell`.
+    pub fn load_zero(&mut self) -> AssignedValue<F> {
+        if let Some(zcell) = &self.zero_cell {
+            return *zcell;
+        }
+        let zero_cell = self.load_constant(F::zero());
+        self.zero_cell = Some(zero_cell);
+        zero_cell
     }
 }
 
