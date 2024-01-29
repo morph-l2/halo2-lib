@@ -508,3 +508,26 @@ impl<F: PrimeField, Fp: PrimeField> Selectable<F> for FpConfig<F, Fp> {
         select_by_indicator::crt::<F>(self.range.gate(), ctx, a, coeffs, &self.limb_bases)
     }
 }
+
+impl<F: PrimeField, Fp: PrimeField> FpConfig<F,Fp>{
+    fn load_fp_private(&self, ctx: &mut Context<F>, a: Value<Fp>) -> CRTInteger<F> {
+        let a_vec = a.map(|x| halo2_base::utils::decompose_biguint::<F>(&fe_to_biguint(&x), self.num_limbs, self.limb_bits)).transpose_vec(self.num_limbs);
+    
+        let limbs = self.range.gate().assign_witnesses(ctx, a_vec);
+    
+        let a_native = OverflowInteger::<F>::evaluate(
+            self.range.gate(),
+            //&self.bigint_chip,
+            ctx,
+            &limbs,
+            self.limb_bases.iter().cloned(),
+        );
+    
+        let a_loaded =
+            CRTInteger::construct(OverflowInteger::construct(limbs, self.limb_bits), a_native, a.map(|x| fe_to_biguint(&x).into()));
+    
+        // TODO: this range check prevents loading witnesses that are not in "proper" representation form, is that ok?
+        self.range_check(ctx, &a_loaded, Fp::NUM_BITS as usize);
+        a_loaded
+    }
+}
