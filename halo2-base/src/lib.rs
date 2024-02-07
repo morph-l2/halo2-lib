@@ -541,8 +541,8 @@ impl<'a, F: ScalarField> Context<'a, F> {
         let (fixed_cols, total_fixed) = self.fixed_stats();
         println!("Fixed columns: {fixed_cols}, Total fixed cells: {total_fixed}");
     }
-    /// Assigns a witness value and returns the corresponding assigned cell.
-    /// * `witness`: the witness value to be assigned
+    ///// Assigns a witness value and returns the corresponding assigned cell.
+    //// * `witness`: the witness value to be assigned
     // pub fn load_witness(&mut self, witness: F, column: Column<Advice>, context_id: usize, row_offset: usize) -> AssignedValue<F> {
     //     self.assign_cell(QuantumCell::Witness(witness), column, context_id, row_offset, self.current_phase);
     //     // if !self.witness_gen_only {
@@ -551,8 +551,8 @@ impl<'a, F: ScalarField> Context<'a, F> {
     //     self.last().unwrap()
     // }
 
-    /// Assigns a constant value and returns the corresponding assigned cell.
-    /// * `c`: the constant value to be assigned
+    ///// Assigns a constant value and returns the corresponding assigned cell.
+    ///// * `c`: the constant value to be assigned
     // pub fn load_constant(&mut self, c: F, column: Column<Advice>, context_id: usize, row_offset: usize) -> AssignedValue<F> {
     //     self.assign_cell(QuantumCell::Constant(c), column, context_id, row_offset, self.current_phase);
     //     // if !self.witness_gen_only {
@@ -561,7 +561,7 @@ impl<'a, F: ScalarField> Context<'a, F> {
     //     self.last().unwrap()
     // }
 
-    /// Assigns the 0 value to a new cell or returns a previously assigned zero cell from `zero_cell`.
+    //// Assigns the 0 value to a new cell or returns a previously assigned zero cell from `zero_cell`.
     // pub fn load_zero(&mut self) -> AssignedValue<F> {
     //     if let Some(zcell) = &self.zero_cell {
     //         return *zcell;
